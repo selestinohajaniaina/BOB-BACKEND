@@ -10,7 +10,8 @@
     "check": "node --check app.js && node --check server.js && node --check config/database.js && node --check config/migrate.js && node --check controllers/auth.controller.js && node --check controllers/project.controller.js && node --check middleware/auth.middleware.js && node --check models/User.js && node --check models/Project.js && node --check routes/auth.routes.js && node --check routes/project.routes.js",
     "migrate": "node -e \"require('dotenv').config(); require('./config/migrate')().then(() => process.exit(0)).catch((error) => { console.error(error); process.exit(1); })\"",
     "test:smoke": "node scripts/auth-smoke-test.js"
-    ,"test:projects": "node scripts/projects-smoke-test.js"
+    ,"test:projects": "node scripts/projects-smoke-test.js",
+    "test:settings": "node scripts/settings-smoke-test.js"
   },
   "engines": {
     "node": ">=20"
