@@ -7,12 +7,13 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "check": "node --check app.js && node --check server.js && node --check config/database.js && node --check config/migrate.js && node --check controllers/auth.controller.js && node --check controllers/project.controller.js && node --check middleware/auth.middleware.js && node --check models/User.js && node --check models/Project.js && node --check routes/auth.routes.js && node --check routes/project.routes.js",
+    "check": "node --check app.js && node --check server.js && node --check config/database.js && node --check config/migrate.js && node --check controllers/auth.controller.js && node --check controllers/project.controller.js && node --check controllers/diagram.controller.js && node --check middleware/auth.middleware.js && node --check models/User.js && node --check models/Project.js && node --check models/Diagram.js && node --check routes/auth.routes.js && node --check routes/project.routes.js && node --check routes/diagram.routes.js && node --check services/ai.service.js && node --check services/diagram.service.js",
     "migrate": "node -e \"require('dotenv').config(); require('./config/migrate')().then(() => process.exit(0)).catch((error) => { console.error(error); process.exit(1); })\"",
     "test:smoke": "node scripts/auth-smoke-test.js"
     ,"test:projects": "node scripts/projects-smoke-test.js",
     "test:settings": "node scripts/settings-smoke-test.js",
-    "test:context": "node scripts/context-smoke-test.js"
+    "test:context": "node scripts/context-smoke-test.js",
+    "test:diagrams": "node scripts/diagrams-smoke-test.js"
   },
   "engines": {
     "node": ">=20"
