@@ -11,12 +11,16 @@ Utilise des acteurs, des cas d'utilisation et une frontière de système lorsque
 N'ajoute aucune explication, aucun commentaire conversationnel et aucune clôture Markdown.`;
 
 function buildUseCaseRequest(project, prompt) {
-  return `Nom du projet :\n${project.name}\n\nDescription :\n${project.description || 'Non renseignée'}\n\nContexte détaillé :\n${project.context || 'Non renseigné'}\n\nDemande spécifique :\n${prompt}`;
+  const sections = [
+    `Nom du projet :\n${project.name}`,
+    `Description :\n${project.description || 'Non renseignée'}`,
+    `Contexte détaillé :\n${project.context || 'Non renseigné'}`
+  ];
+  if (prompt) sections.push(`Demande spécifique :\n${prompt}`);
+  return sections.join('\n\n');
 }
 
 function extractAndValidatePlantUml(response) {
-  console.log("response IA", response);
-  
   if (typeof response !== 'string') throw new InvalidDiagramResponseError('Réponse IA invalide');
   const match = response.match(/@startuml\b[\s\S]*?@enduml/i);
   if (!match) throw new InvalidDiagramResponseError('La réponse IA ne contient pas de bloc PlantUML complet');

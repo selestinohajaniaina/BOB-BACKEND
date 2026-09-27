@@ -6,8 +6,9 @@ const Diagram = sequelize.define('Diagram', {
   projectId: { type: DataTypes.INTEGER, allowNull: false },
   name: { type: DataTypes.STRING(160), allowNull: false, validate: { notEmpty: true } },
   type: { type: DataTypes.STRING(30), allowNull: false, validate: { isIn: [['use_case']] } },
-  prompt: { type: DataTypes.TEXT, allowNull: false, validate: { notEmpty: true } },
-  plantUml: { type: DataTypes.TEXT, allowNull: false, validate: { notEmpty: true } }
+  prompt: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
+  plantUml: { type: DataTypes.TEXT, allowNull: false, validate: { notEmpty: true } },
+  svg: { type: DataTypes.TEXT, allowNull: true }
 }, { tableName: 'diagrams', timestamps: true });
 
 module.exports = Diagram;
