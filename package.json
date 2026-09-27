@@ -11,7 +11,8 @@
     "migrate": "node -e \"require('dotenv').config(); require('./config/migrate')().then(() => process.exit(0)).catch((error) => { console.error(error); process.exit(1); })\"",
     "test:smoke": "node scripts/auth-smoke-test.js"
     ,"test:projects": "node scripts/projects-smoke-test.js",
-    "test:settings": "node scripts/settings-smoke-test.js"
+    "test:settings": "node scripts/settings-smoke-test.js",
+    "test:context": "node scripts/context-smoke-test.js"
   },
   "engines": {
     "node": ">=20"

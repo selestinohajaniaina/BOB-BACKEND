@@ -3,7 +3,9 @@ const sequelize = require('./database');
 
 const migrations = [
   ['202609260000-create-users', require('../migrations/202609260000-create-users')],
-  ['202609260001-create-projects', require('../migrations/202609260001-create-projects')]
+  ['202609260001-create-projects', require('../migrations/202609260001-create-projects')],
+  ['202609270000-add-project-context', require('../migrations/202609270000-add-project-context')],
+  ['202609270001-remove-project-context-metadata', require('../migrations/202609270001-remove-project-context-metadata')]
 ];
 
 async function runMigrations() {
