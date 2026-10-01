@@ -7,7 +7,8 @@ const migrations = [
   ['202609270000-add-project-context', require('../migrations/202609270000-add-project-context')],
   ['202609270001-remove-project-context-metadata', require('../migrations/202609270001-remove-project-context-metadata')],
   ['202609270002-create-diagrams', require('../migrations/202609270002-create-diagrams')],
-  ['202609270003-add-diagram-svg', require('../migrations/202609270003-add-diagram-svg')]
+  ['202609270003-add-diagram-svg', require('../migrations/202609270003-add-diagram-svg')],
+  ['202610010000-remove-diagram-svg', require('../migrations/202610010000-remove-diagram-svg')]
 ];
 
 async function runMigrations() {

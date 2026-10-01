@@ -1,27 +1,15 @@
 require('dotenv').config();
 
 const assert = require('node:assert/strict');
-const http = require('node:http');
 const app = require('../app');
 const sequelize = require('../config/database');
 const runMigrations = require('../config/migrate');
 const aiService = require('../services/ai.service');
-const { validateSvg } = require('../services/plantuml-renderer.service');
 const { Diagram } = require('../models');
 
 async function run() {
-  assert.throws(() => validateSvg('<svg><script>alert(1)</script></svg>'), /contenu interdit/);
   await sequelize.authenticate();
   await runMigrations();
-  const renderRequests = [];
-  const renderServer = http.createServer((req, res) => {
-    renderRequests.push(req.url);
-    res.writeHead(200, { 'Content-Type': 'image/svg+xml' });
-    res.end('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10"/></svg>');
-  });
-  renderServer.listen(0, '127.0.0.1');
-  await new Promise((resolve) => renderServer.once('listening', resolve));
-  process.env.PLANTUML_SERVER_URL = `http://127.0.0.1:${renderServer.address().port}/plantuml`;
   const calls = [];
   aiService.generateText = async (request) => {
     calls.push(request);
@@ -56,12 +44,11 @@ async function run() {
     assert.equal((await request(`/projects/${projectId}/diagrams`, { method: 'POST', headers: authA, body: JSON.stringify({ type: 'class', prompt: 'Classes' }) })).status, 400, 'type refusé');
     const withoutPrompt = await request(`/projects/${projectId}/diagrams`, { method: 'POST', headers: authA, body: JSON.stringify({ type: 'use_case' }) });
     assert.equal(withoutPrompt.status, 201, 'description facultative');
-    assert.match(withoutPrompt.body.diagram.svg, /^<svg/); assert.equal('plantUml' in withoutPrompt.body.diagram, false, 'PlantUML non exposé');
+    assert.match(withoutPrompt.body.diagram.plantUml, /^@startuml/); assert.equal('svg' in withoutPrompt.body.diagram, false, 'SVG non exposé');
 
     const generated = await request(`/projects/${projectId}/diagrams`, { method: 'POST', headers: authA, body: JSON.stringify({ type: 'use_case', prompt: 'Montrer les interactions principales' }) });
     assert.equal(generated.status, 201); assert.equal(generated.body.diagram.type, 'use_case');
-    assert.match(generated.body.diagram.svg, /^<svg/); assert.equal('plantUml' in generated.body.diagram, false, 'PlantUML non exposé');
-    assert.ok(renderRequests.every((path) => /^\/plantuml\/svg\/[A-Za-z0-9_-]+$/.test(path)), 'PlantUML encodé côté backend');
+    assert.match(generated.body.diagram.plantUml, /^@startuml/); assert.equal('svg' in generated.body.diagram, false, 'SVG non exposé');
     const stored = await Diagram.findByPk(generated.body.diagram.id);
     assert.match(stored.plantUml, /^@startuml/); assert.match(stored.plantUml, /@enduml$/); assert.ok(!stored.plantUml.includes('```'), 'le Markdown est retiré en base');
     assert.match(calls[1].systemPrompt, /cas d'utilisation/i); assert.match(calls[1].userPrompt, /Bibliothèque/); assert.match(calls[1].userPrompt, /Gestion des prêts/); assert.match(calls[1].userPrompt, /membre et bibliothécaire/); assert.match(calls[1].userPrompt, /interactions principales/);
@@ -76,10 +63,11 @@ async function run() {
     assert.equal(invalid.status, 502); assert.match(invalid.body.message, /PlantUML valide/);
     assert.equal((await request(`/projects/${projectId}/diagrams/${diagramId}`, { method: 'DELETE', headers: authA })).status, 200, 'suppression autorisée');
     assert.equal((await request(`/projects/${projectId}/diagrams`, { headers: authA })).body.diagrams.length, 1, 'suppression persistée');
-    console.log('Scénarios diagrammes et rendu SVG réussis');
+    const description = await sequelize.getQueryInterface().describeTable('diagrams');
+    assert.equal('svg' in description, false, 'colonne SVG supprimée');
+    console.log('Scénarios diagrammes PlantUML réussis');
   } finally {
     await new Promise((resolve) => server.close(resolve));
-    await new Promise((resolve) => renderServer.close(resolve));
     await sequelize.close();
   }
 }
